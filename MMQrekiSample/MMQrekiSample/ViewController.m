@@ -13,7 +13,7 @@
 
 @property (weak, nonatomic) IBOutlet UIDatePicker *datePicker;
 @property (strong, nonatomic) NSDateFormatter *dateFormatter;
-@property (strong, nonatomic) NSString *selectedDate;
+@property (strong, nonatomic) NSDate *selectedDate;
 
 @end
 
@@ -36,7 +36,7 @@
 }
 
 - (void)datePickerValueChanged:(UIDatePicker *)sender {
-    self.selectedDate = [self.dateFormatter stringFromDate:sender.date];
+    self.selectedDate = sender.date;
 }
 - (IBAction)pushOldCalButton:(id)sender {
     

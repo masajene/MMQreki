@@ -1,6 +1,5 @@
 //
 //  MMQreki.m
-//  appme
 //
 //  Created by MasashiMizuno on 2014/11/30.
 //  Copyright (c) 2014年 水野 真史. All rights reserved.
@@ -16,11 +15,18 @@ static const NSInteger minDate = 1999;
 @property (strong, nonatomic) NSMutableArray *maxDays; // nmdays
 @property (strong, nonatomic) NSMutableArray *oldTable; // otbl
 
+@property (strong, nonatomic) NSDateFormatter *dateFormatter;
+
 @end
 
 @implementation MMQreki
 
+#pragma mark -------------------------------------------------------
+#pragma mark - initialize
+#pragma mark -------------------------------------------------------
+
 - (void)initializeTable {
+    
     self.replaceTable = [@[@[@611,@2350],
                        @[@468,@3222],
                        @[@316,@7317],
@@ -56,17 +62,27 @@ static const NSInteger minDate = 1999;
     
     self.maxDays = [@[@31,@28,@31,@30,@31,@30,@31,@31,@30,@31,@30,@31] mutableCopy];
     self.oldTable = [@[@14] mutableCopy];
+    
+    if (!self.dateFormatter) {
+        self.dateFormatter = [[NSDateFormatter alloc] init];
+        self.dateFormatter.dateFormat = @"yyyy/MM/dd";
+    }
 }
 
-// 旧暦→新暦変換
-- (NSString *)getOldToNewCalender:(NSString *)oldDate {
+#pragma mark -------------------------------------------------------
+#pragma mark - Public Methods
+#pragma mark -------------------------------------------------------
+
+- (NSString *)getOldToNewCalender:(NSDate *)oldDate {
     
     [self initializeTable];
     
+    NSString *oldDateString = [self.dateFormatter stringFromDate:oldDate];
+    
     NSNumber *newYear, *newMonth, *newDay, *tmp, *dofNewYear;
-    NSNumber *oyy = @([[oldDate substringToIndex:4] intValue]);
-    NSNumber *omm = @([[oldDate substringWithRange:NSMakeRange(5, 2)] intValue]);
-    NSNumber *odd = @([[oldDate substringFromIndex:8] intValue]);
+    NSNumber *oyy = @([[oldDateString substringToIndex:4] intValue]);
+    NSNumber *omm = @([[oldDateString substringWithRange:NSMakeRange(5, 2)] intValue]);
+    NSNumber *odd = @([[oldDateString substringFromIndex:8] intValue]);
 
     [self tableExpand:oyy];
 
@@ -104,17 +120,16 @@ static const NSInteger minDate = 1999;
     return [NSString stringWithFormat:@"%@/%@/%@", newYear, newMonth, newDay];
 }
 
-
-
-// 新暦→旧暦変換
-- (NSString *)getNewToOldCalender:(NSString *)newDate {
+- (NSString *)getNewToOldCalender:(NSDate *)newDate {
     
     [self initializeTable];
     
+    NSString *newDateString = [self.dateFormatter stringFromDate:newDate];
+    
     NSNumber *oyy, *omm, *odd, *uruu, *DofNyy;
-    NSNumber *nyy = @([[newDate substringToIndex:4] intValue]);
-    NSNumber *nmm = @([[newDate substringWithRange:NSMakeRange(5, 2)] intValue]);
-    NSNumber *ndd = @([[newDate substringFromIndex:8] intValue]);
+    NSNumber *nyy = @([[newDateString substringToIndex:4] intValue]);
+    NSNumber *nmm = @([[newDateString substringWithRange:NSMakeRange(5, 2)] intValue]);
+    NSNumber *ndd = @([[newDateString substringFromIndex:8] intValue]);
     
     DofNyy = [self numberDays:nyy month:nmm day:ndd];
     oyy = nyy;
@@ -145,7 +160,23 @@ static const NSInteger minDate = 1999;
     return [NSString stringWithFormat:@"%@/%@/%@", oyy, omm, odd];
 }
 
-// グレゴリウス暦閏年判定。閏年なら 1, 平年なら 0
+- (NSString *)getRokuyo:(NSDate *)newDate {
+    
+    NSArray *rokuyo = @[@"大安",@"赤口",@"先勝",@"友引",@"先負",@"仏滅"];
+    
+    NSString *oldCal = [self getNewToOldCalender:newDate];
+    NSInteger oldMonth = [[oldCal substringWithRange:NSMakeRange(5, 2)] intValue];
+    NSInteger oldDay = [[oldCal substringFromIndex:8] intValue];
+    
+    float index = (oldMonth + oldDay) % 6;
+    
+    return rokuyo[(int)index];
+}
+
+#pragma mark -------------------------------------------------------
+#pragma mark - Private Methods
+#pragma mark -------------------------------------------------------
+
 - (NSNumber *)leapYear:(NSNumber *)year {
     NSInteger ans = 0;
     if (([year intValue] % 4) == 0) ans = 1;
@@ -154,7 +185,6 @@ static const NSInteger minDate = 1999;
     return @(ans);
 }
 
-// 新暦年初からの通日 1/1 = 1
 - (NSNumber *)numberDays:(NSNumber *)year month:(NSNumber *)month day:(NSNumber *)day {
 
     self.maxDays[1] = @(28 + [[self leapYear:year] intValue]);
@@ -166,7 +196,6 @@ static const NSInteger minDate = 1999;
     return days;
 }
 
-// 旧暦・新暦テーブル(otbl)作成
 - (void)tableExpand:(NSNumber *)year {
 
     NSNumber *ommax, *days, *uruu, *bit;
@@ -200,19 +229,6 @@ static const NSInteger minDate = 1999;
     } else {
         self.oldTable[13] = @[@0,@0];
     }
-}
-
-- (NSString *)getRokuyo:(NSString *)newYear {
-    
-    NSArray *rokuyo = @[@"大安",@"赤口",@"先勝",@"友引",@"先負",@"仏滅"];
-    
-    NSString *oldCal = [self getNewToOldCalender:newYear];
-    NSInteger oldMonth = [[oldCal substringWithRange:NSMakeRange(5, 2)] intValue];
-    NSInteger oldDay = [[oldCal substringFromIndex:8] intValue];
-    
-    float index = (oldMonth + oldDay) % 6;
-    
-    return rokuyo[(int)index];
 }
 
 @end

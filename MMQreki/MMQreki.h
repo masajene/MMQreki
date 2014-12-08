@@ -1,6 +1,5 @@
 //
 //  MMQreki.h
-//  appme
 //
 //  Created by MasashiMizuno on 2014/11/30.
 //  Copyright (c) 2014年 水野 真史. All rights reserved.
@@ -10,8 +9,31 @@
 
 @interface MMQreki : NSObject
 
-- (NSString *)getOldToNewCalender:(NSString *)oldDate;
-- (NSString *)getNewToOldCalender:(NSString *)newDate;
-- (NSString *)getRokuyo:(NSString *)newYear;
+/**
+ *  Conversion from the old lunar calendar to the Gregorian calendar
+ *
+ *  @param oldDate old lunar calendar
+ *
+ *  @return Gregorian calendar
+ */
+- (NSString *)getOldToNewCalender:(NSDate *)oldDate;
+
+/**
+ *  Conversion from Gregorian calendar to the old lunar calendar
+ *
+ *  @param newDate Gregorian calendar
+ *
+ *  @return old lunar calendar
+ */
+- (NSString *)getNewToOldCalender:(NSDate *)newDate;
+
+/**
+ *  Get Rokuyo
+ *
+ *  @param newDate Gregorian calendar
+ *
+ *  @return Rokuyo
+ */
+- (NSString *)getRokuyo:(NSDate *)newDate;
 
 @end
