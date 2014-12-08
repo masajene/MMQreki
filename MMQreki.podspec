@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
 
 # Source Info
   s.platform     =  :ios, '7.0'
-  s.source       = { :git => 'https://github.com/masajene/MMQreki.git', :tag => '0.6.1' }
+  s.source       = { :git => 'https://github.com/masajene/MMQreki.git', :tag => '0.1' }
   s.source_files = 'MMQreki/*.{h,m}'
   #s.framework    =  'CoreLocation', 'CoreBluetooth'
 
