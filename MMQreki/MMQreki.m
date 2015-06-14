@@ -157,6 +157,7 @@ static const NSInteger minDate = 1999;
     } else {
         uruu = @0;
     }
+#pragma unused(uruu)
     return [NSString stringWithFormat:@"%@/%@/%@", oyy, omm, odd];
 }
 
@@ -165,12 +166,16 @@ static const NSInteger minDate = 1999;
     NSArray *rokuyo = @[@"大安",@"赤口",@"先勝",@"友引",@"先負",@"仏滅"];
     
     NSString *oldCal = [self getNewToOldCalender:newDate];
-    NSInteger oldMonth = [[oldCal substringWithRange:NSMakeRange(5, 2)] intValue];
-    NSInteger oldDay = [[oldCal substringFromIndex:8] intValue];
+    NSArray *sepCal = [oldCal componentsSeparatedByString:@"/"];
+    NSInteger oldMonth = [sepCal[1] intValue];
+    NSInteger oldDay = [sepCal[2] intValue];
     
-    float index = (oldMonth + oldDay) % 6;
+    NSInteger md = oldMonth + oldDay;
+    float index = md % 6;
     
-    return rokuyo[(int)index];
+    NSString *roku = rokuyo[(int)index];
+    
+    return roku;
 }
 
 #pragma mark -------------------------------------------------------
